@@ -13,45 +13,57 @@ Verify the output by running the Web-Layout in any web browser.
 ## PROGRAM:
 ### App.css
 ```css
-.calculator {
+.bmi-calculator {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-top: 2rem;
 }
 
-.input,
-.result {
-  width: 300px;
-  height: 50px;
-  background-color: #f2f2f2;
-  margin-bottom: 1rem;
+.input-container {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  padding: 0 1rem;
-  font-size: 1.5rem;
-  font-weight: bold;
+  margin-bottom: 1rem;
 }
 
-.buttons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
+.input-container label {
+  margin-right: 1rem;
+  font-size: 1.2rem;
+}
+
+.input-container input {
+  width: 150px;
+  height: 30px;
+  padding: 0.5rem;
+  font-size: 1rem;
 }
 
 button {
-  width: 70px;
-  height: 50px;
-  background-color: #e0e0e0;
+  width: 150px;
+  height: 40px;
+  background-color: #4caf50;
+  color: white;
   border: none;
   border-radius: 5px;
   font-size: 1.2rem;
   cursor: pointer;
+  margin-bottom: 1rem;
 }
 
-button:hover {
-  background-color: #d3d3d3;
+.result {
+  width: 250px;
+  background-color: #f2f2f2;
+  padding: 1rem;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.bmi {
+  font-weight: bold;
+}
+
+.category {
+  margin-top: 0.5rem;
 }
 ```
 ### App.js
@@ -60,48 +72,63 @@ import React, { useState } from 'react';
 import './App.css';
 
 const App = () => {
-  const [input, setInput] = useState('');
-  const [result, setResult] = useState('');
+  const [weight, setWeight] = useState('');
+  const [height, setHeight] = useState('');
+  const [bmi, setBMI] = useState('');
+  const [category, setCategory] = useState('');
 
-  const handleClick = (value) => {
-    if (value === '=') {
-      try {
-        setResult(eval(input));
-      } catch (error) {
-        setResult('Error');
-      }
-    } else if (value === 'C') {
-      setInput('');
-      setResult('');
+  const calculateBMI = () => {
+    const heightInMeters = height / 100;
+    const bmiResult = (weight / (heightInMeters * heightInMeters)).toFixed(2);
+    setBMI(bmiResult);
+
+    if (bmiResult < 18.5) {
+      setCategory('Underweight');
+    } else if (bmiResult >= 18.5 && bmiResult < 25) {
+      setCategory('Normal Weight');
+    } else if (bmiResult >= 25 && bmiResult < 30) {
+      setCategory('Overweight');
     } else {
-      setInput(input + value);
+      setCategory('Obese');
     }
   };
 
+  const handleWeightChange = (e) => {
+    setWeight(e.target.value);
+  };
+
+  const handleHeightChange = (e) => {
+    setHeight(e.target.value);
+  };
+
   return (
-    <div className="calculator">
-      <h1>Simple Calculator</h1>
-      <div className="input">{input}</div>
-      <div className="result">{result}</div>
-      <div className="buttons">
-        <button onClick={() => handleClick('7')}>7</button>
-        <button onClick={() => handleClick('8')}>8</button>
-        <button onClick={() => handleClick('9')}>9</button>
-        <button onClick={() => handleClick('/')}>/</button>
-        <button onClick={() => handleClick('4')}>4</button>
-        <button onClick={() => handleClick('5')}>5</button>
-        <button onClick={() => handleClick('6')}>6</button>
-        <button onClick={() => handleClick('*')}>*</button>
-        <button onClick={() => handleClick('1')}>1</button>
-        <button onClick={() => handleClick('2')}>2</button>
-        <button onClick={() => handleClick('3')}>3</button>
-        <button onClick={() => handleClick('-')}>-</button>
-        <button onClick={() => handleClick('0')}>0</button>
-        <button onClick={() => handleClick('.')}>.</button>
-        <button onClick={() => handleClick('=')}>=</button>
-        <button onClick={() => handleClick('+')}>+</button>
-        <button onClick={() => handleClick('C')}>C</button>
+    <div className="bmi-calculator">
+      <h1>BMI Calculator</h1>
+      <div className="input-container">
+        <label htmlFor="weight">Weight (kg)</label>
+        <input
+          type="number"
+          id="weight"
+          value={weight}
+          onChange={handleWeightChange}
+        />
       </div>
+      <div className="input-container">
+        <label htmlFor="height">Height (cm)</label>
+        <input
+          type="number"
+          id="height"
+          value={height}
+          onChange={handleHeightChange}
+        />
+      </div>
+      <button onClick={calculateBMI}>Calculate BMI</button>
+      {bmi && (
+        <div className="result">
+          <div className="bmi">BMI: {bmi}</div>
+          <div className="category">Category: {category}</div>
+        </div>
+      )}
     </div>
   );
 };
